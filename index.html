@@ -3,7 +3,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Evolution Rings Prototype</title>
+  <title>Evolution Rings</title>
+  <meta name="description" content="Evolution Rings — инкрементальная стратегия с престижем, испытаниями и путями развития." />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -44,15 +45,22 @@
 
     <div class="mainPane">
       <div class="leftPane">
-        <div class="panelTitle">Кольца</div>
+        <div class="panelTitle">Орбиты</div>
         <div class="ringList" id="ringList"></div>
         <div class="btnStack">
           <button id="toggle">Пауза</button>
           <button id="reset">Сброс</button>
           <button id="prestige" class="ghost">Престиж (эпоха +1)</button>
           <button id="timeBoost" class="ghost">Х2 время (30с, Essence)</button>
+          <button id="overdrive" class="ghost">Overdrive x2 (10с)</button>
+          <div class="btnRow">
+            <button id="orbitUp" class="ghost">Орбита ↑</button>
+            <button id="orbitDown" class="ghost">Орбита ↓</button>
+          </div>
         </div>
         <div class="hint" id="modifierHint">Мировой модификатор: нет</div>
+        <div class="hint" id="eventHint">Событие: нет</div>
+        <div class="hint" id="overdriveHint">Overdrive: готов</div>
         <div class="hint" id="pathHint">Путь не выбран</div>
         <div class="hint" id="offlineHint"></div>
       </div>
@@ -67,6 +75,7 @@
           <button class="tabBtn" data-pane="ep">Магазин EP</button>
           <button class="tabBtn" data-pane="shops">Магазины GP</button>
           <button class="tabBtn" data-pane="auto">Автоматика</button>
+          <button class="tabBtn" data-pane="exp">Экспедиции</button>
           <button class="tabBtn" data-pane="ch">Испытания</button>
           <button class="tabBtn" data-pane="paths">Пути</button>
           <button class="tabBtn" data-pane="essence">Essence</button>
@@ -79,28 +88,28 @@
 
         <div class="pane pane-main active">
           <div class="card">
-            <div class="cardTitle">Выбранное кольцо</div>
-            <div class="hint">Откройте вкладку "Магазин EP" для апгрейдов выбранного кольца и просмотра цифр.</div>
+            <div class="cardTitle">Выбранная орбита</div>
+            <div class="hint">Откройте вкладку "Магазин EP" для апгрейдов выбранной орбиты и просмотра цифр.</div>
             <div class="hint" id="recHint"></div>
+          </div>
+          <div class="card">
+            <div class="cardTitle">Контракты системы</div>
+            <div class="contractList" id="contractList"></div>
           </div>
         </div>
 
         <div class="pane pane-ep">
           <div class="card">
-            <div class="cardTitle">Магазин EP (текущее кольцо)</div>
+            <div class="cardTitle">Магазин EP (текущая орбита)</div>
             <div class="cardGrid">
               <div><span class="k">#</span>: <span id="selName">—</span></div>
               <div><span class="k">x</span>: <span id="selX">—</span></div>
               <div><span class="k">&Delta;</span>: <span id="selD">-</span></div>
               <div><span class="k">Скорость</span>: <span id="selSpeed">—</span> %/сек</div>
               <div><span class="k">Уровень</span>: <span id="selLvl">—</span></div>
+              <div><span class="k">Тип</span>: <span id="selType">—</span></div>
             </div>
-            <div class="btnRow">
-              <button id="upSpeed">+Скорость (+15%)</button>
-              <button id="upDelta">+&Delta; прирост</button>
-              <button id="reduceInflation">Снижение инфляции (I&times;0.98)</button>
-              <button id="buySynergy">Синергия</button>
-            </div>
+            <div class="btnRow" id="epShopList"></div>
             <div class="hint" id="costHint">Стоимость: —</div>
           </div>
         </div>
@@ -108,12 +117,7 @@
         <div class="pane pane-shops">
           <div class="card">
             <div class="cardTitle">Магазин II - Гены эпохи (GP)</div>
-            <div class="btnRow">
-              <button id="buyGeneX">+5% ко всем x (перманентно)</button>
-              <button id="buyGeneInfl">-10% к росту инфляции (перманентно)</button>
-              <button id="buyGeneRing">+1 кольцо с начала</button>
-              <button id="buyGeneAuto">Авто-апгрейды дешевого</button>
-            </div>
+            <div class="btnRow" id="gpShopList"></div>
             <div class="hint" id="geneHint">GP-покупки работают во всех эпохах.</div>
           </div>
         </div>
@@ -132,6 +136,19 @@
               <button id="autoPriSyn" class="ghost">Приоритет: Synergy</button>
             </div>
             <div class="hint">Автопокупка усиливается ген-апгрейдом. Автопрестиж срабатывает когда EP >= Target.</div>
+          </div>
+        </div>
+
+        <div class="pane pane-exp">
+          <div class="card">
+            <div class="cardTitle">Экспедиции</div>
+            <div class="hint" id="expeditionStatus">Корабль готов.</div>
+            <div class="btnRow">
+              <button id="startExpedition">Отправить корабль</button>
+              <button id="claimExpedition" class="ghost">Забрать награду</button>
+            </div>
+            <div class="hint" id="expeditionReward">Награда: —</div>
+            <div class="hint" id="artifactHint">Коллекция: —</div>
           </div>
         </div>
 
@@ -163,10 +180,7 @@
         <div class="pane pane-essence">
           <div class="card">
             <div class="cardTitle">Essence</div>
-            <div class="btnRow">
-              <button id="buySkin">Скин/эффект</button>
-              <button id="buyBurst">Импульс времени x2 (30с)</button>
-            </div>
+            <div class="btnRow" id="essenceShopList"></div>
             <div class="hint">Essence падает редко: N замыканий, ачивки, идеальный цикл.</div>
           </div>
         </div>
@@ -195,14 +209,46 @@
             </div>
             <div class="hint">Опции сохраняются локально.</div>
           </div>
+          <div class="card">
+            <div class="cardTitle">Кастомизация системы</div>
+            <div class="btnRow">
+              <button id="cycleStar">Цвет звезды</button>
+              <button id="cycleOrbit">Цвет орбит</button>
+              <button id="cycleBg">Фон</button>
+              <button id="toggleOrbitTrails" class="ghost">Шлейфы: вкл</button>
+            </div>
+            <div class="hint" id="styleHint">Стиль: —</div>
+          </div>
+          <div class="card">
+            <div class="cardTitle">Dev-панель</div>
+            <div class="btnRow">
+              <button id="devToggle">Dev: выкл</button>
+              <button id="devGrantEP" class="ghost">+1e6 EP</button>
+              <button id="devGrantGP" class="ghost">+10 GP</button>
+              <button id="devGrantEssence" class="ghost">+5 Essence</button>
+              <button id="devFastForward" class="ghost">+10 минут</button>
+              <button id="devReset" class="ghost">Полный сброс</button>
+            </div>
+            <div class="hint" id="devHint">Dev-панель скрыта по умолчанию.</div>
+          </div>
+          <div class="card">
+            <div class="cardTitle">Сохранение</div>
+            <div class="btnRow">
+              <button id="exportSave">Экспорт</button>
+              <button id="importSave" class="ghost">Импорт</button>
+              <button id="wipeSave" class="ghost">Удалить сейв</button>
+            </div>
+            <textarea id="saveData" class="saveData" rows="4" placeholder="Сюда появится код сейва после экспорта."></textarea>
+            <div class="hint" id="saveHint">Экспортируйте или вставьте код для импорта.</div>
+          </div>
         </div>
 
         <div class="pane pane-help">
           <div class="card">
             <div class="cardTitle">Помощь</div>
             <div class="hint">
-              1) Кликайте по кольцам слева или на круге, чтобы выбрать.<br/>
-              2) Вкладка “Магазин EP” — апгрейды выбранного кольца и синергия.<br/>
+              1) Кликайте по орбитам слева или на круге, чтобы выбрать.<br/>
+              2) Вкладка “Магазин EP” — апгрейды выбранной орбиты и синергия.<br/>
               3) Престиж даёт GP и меняет модификатор мира.<br/>
               4) Essence — редкая валюта для косметики и бустов времени.
             </div>
@@ -212,12 +258,13 @@
         <div class="pane pane-credits">
           <div class="card">
             <div class="cardTitle">Credits</div>
-            <div class="hint">Evolution Rings — prototype build.</div>
+            <div class="hint">Evolution Rings — production build.</div>
           </div>
         </div>
       </div>
     </div>
   </div>
+  <div id="toast" aria-live="polite"></div>
 
   <script src="game.js"></script>
 </body>

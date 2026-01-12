@@ -53,6 +53,11 @@ button.ghost.active {
   border-color: rgba(255,255,255,0.35);
 }
 button:disabled { opacity: 0.35; cursor: not-allowed; }
+button:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid rgba(160, 200, 255, 0.8);
+  outline-offset: 2px;
+}
 
 .stat {
   pointer-events: none;
@@ -134,6 +139,41 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
   pointer-events: none;
 }
 .btnRow button { pointer-events: auto; }
+.shopBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  min-width: 170px;
+}
+.shopBtn .title {
+  font-size: 13px;
+  font-weight: 700;
+}
+.shopBtn .meta {
+  font-size: 11px;
+  opacity: 0.72;
+}
+
+.contractList {
+  pointer-events: auto;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+}
+.contractItem {
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.04);
+  border-radius: 12px;
+  padding: 8px 10px;
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+.contractItem.done {
+  border-color: rgba(126, 255, 188, 0.6);
+  background: linear-gradient(120deg, rgba(126,255,188,0.12), rgba(255,255,255,0.04));
+}
 
 .achList {
   pointer-events: auto;
@@ -263,6 +303,41 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
 .tabBtn { padding: 8px 10px; }
 .pane { display: none; pointer-events: none; }
 .pane.active { display: block; pointer-events: none; }
+.saveData {
+  width: 100%;
+  margin-top: 8px;
+  background: rgba(5, 10, 18, 0.75);
+  color: #e8edf7;
+  border: 1px solid rgba(255,255,255,0.16);
+  border-radius: 12px;
+  padding: 8px 10px;
+  resize: vertical;
+  pointer-events: auto;
+  font-family: "JetBrains Mono", "SF Mono", ui-monospace, "Segoe UI", monospace;
+  font-size: 12px;
+}
+
+#toast {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  max-width: 320px;
+  background: rgba(12, 16, 28, 0.95);
+  color: #e8edf7;
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 14px;
+  padding: 10px 12px;
+  box-shadow: 0 12px 28px rgba(0,0,0,0.32);
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  pointer-events: none;
+  z-index: 5;
+}
+#toast.show {
+  opacity: 1;
+  transform: translateY(0);
+}
 
 .challengeList {
   pointer-events: auto;
